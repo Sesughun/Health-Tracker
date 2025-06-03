@@ -1,91 +1,104 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+    import { useState } from 'react';
+    import { setUser } from '../utils/storage';
 
-export default function Register({ setIsLoggedIn, setCurrentPage, setUser }) {
-  const [name, setName] = useState('');
-  const [studentId, setStudentId] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+    const Register = ({ onRegister }) => {
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
+      const [error, setError] = useState('');
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    if (!email.endsWith('@cu.edu.ng')) {
-      setError('Email must end with @cu.edu.ng');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    setUser({ name, email, studentId });
-    setIsLoggedIn(true);
-    setCurrentPage('profileSetup');
-  };
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!email.endsWith('@cu.edu.ng')) {
+          setError('Email must end with @cu.edu.ng');
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('Passwords do not match');
+          return;
+        }
+        const user = { name, email, password };
+        setUser(user);
+        onRegister(user);
+      };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-purple-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <img src="/images/cu-logo.png" alt="CU Logo" className="mx-auto mb-6 w-24" />
-        <h1 className="text-3xl font-bold text-purple-700 mb-6 text-center">Sign Up</h1>
-        <form onSubmit={handleRegister}>
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Student ID (e.g., CU123456)"
-            value={studentId}
-            onChange={(e) => setStudentId(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email (e.g., student@cu.edu.ng)"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <button
-            type="submit"
-            className="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition"
-          >
-            Register
-          </button>
-        </form>
-        <p className="mt-4 text-center">
-          <Link href="#" onClick={() => setCurrentPage('login')} className="text-purple-600 hover:underline">
-            Back to Login
-          </Link>
-        </p>
-      </div>
-    </div>
-  );
-}
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-md">
+            <div className="flex justify-center mb-4">
+              <img src="/images/cu-logo.png" alt="Covenant University" className="h-16" />
+            </div>
+            <h2 className="text-2xl font-bold mb-6 text-center text-purple-800">Register</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <button
+                type="submit"
+                className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
+              >
+                Register
+              </button>
+            </form>
+            <p className="mt-4 text-center">
+              Already have an account?{' '}
+              <button
+                onClick={() => onRegister({ setCurrentPage: 'login' })}
+                className="text-purple-600 hover:underline"
+              >
+                Login
+              </button>
+            </p>
+          </div>
+        </div>
+      );
+    };
+
+    export default Register;
