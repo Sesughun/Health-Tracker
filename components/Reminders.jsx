@@ -1,113 +1,88 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Sidebar from './Sidebar';
-import { getReminders, setReminders } from '../utils/storage';
-import { generateUUID } from '../utils/uuid';
+    import { useState } from 'react';
 
-export default function Reminders({ profile, setCurrentPage }) {
-  const [reminders, setRemindersState] = useState([]);
-  const [title, setTitle] = useState('');
-  const [time, setTime] = useState(new Date().toISOString().slice(0, 16));
-  const [frequency, setFrequency] = useState('');
+    const Reminders = ({ profile, setCurrentPage }) => {
+      const [reminderText, setReminderText] = useState('');
+      const [reminderTime, setReminderTime] = useState('');
+      const [reminders, setReminders] = useState(JSON.parse(localStorage.getItem('reminders')) || []);
 
-  useEffect(() => {
-    setRemindersState(getReminders());
-  }, []);
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const newReminder = {
+          id: Date.now().toString(),
+          text: reminderText,
+          time: reminderTime,
+        };
+        const updatedReminders = [...reminders, newReminder];
+        setReminders(updatedReminders);
+        localStorage.setItem('reminders', JSON.stringify(updatedReminders));
+        setReminderText('');
+        setReminderTime('');
+      };
 
-  const handleAddReminder = (e) => {
-    e.preventDefault();
-    const newReminder = { id: generateUUID(), title, time, frequency };
-    const updatedReminders = [...reminders, newReminder];
-    setRemindersState(updatedReminders);
-    setReminders(updatedReminders);
-    setTitle('');
-    setTime(new Date().toISOString().slice(0, 16));
-    setFrequency('');
-  };
+      const handleDelete = (id) => {
+        const updatedReminders = reminders.filter((reminder) => reminder.id !== id);
+        setReminders(updatedReminders);
+        localStorage.setItem('reminders', JSON.stringify(updatedReminders));
+      };
 
-  const handleDeleteReminder = (id) => {
-    const updatedReminders = reminders.filter((reminder) => reminder.id !== id);
-    setRemindersState(updatedReminders);
-    setReminders(updatedReminders);
-  };
-
-  return (
-    <div className="min-h-screen bg-purple-100 flex">
-      <Sidebar setCurrentPage={setCurrentPage} />
-      <div className="flex-1 p-8">
-        <h1 className="text-3xl font-bold text-purple-700 mb-6">Alerts/Reminders</h1>
-        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-          <h2 className="text-xl font-semibold text-purple-700 mb-4">Add Reminder</h2>
-          <form onSubmit={handleAddReminder}>
-            <input
-              type="text"
-              placeholder="Reminder Title (e.g., Check Blood Sugar)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-            <input
-              type="datetime-local"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-            <select
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value)}
-              className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            >
-              <option value="">Select Frequency</option>
-              <option value="Daily">Daily</option>
-              <option value="Weekly">Weekly</option>
-            </select>
+      return (
+        <div className="p-6 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4 text-purple-800">Set Reminders</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-purple-700">Reminder Text</label>
+              <input
+                type="text"
+                value={reminderText}
+                onChange={(e) => setReminderText(e.target.value)}
+                className="mt-1 p-2 w-full border rounded-md"
+                placeholder="Enter reminder text"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-purple-700">Reminder Time</label>
+              <input
+                type="datetime-local"
+                value={reminderTime}
+                onChange={(e) => setReminderTime(e.target.value)}
+                className="mt-1 p-2 w-full border rounded-md"
+              />
+            </div>
             <button
               type="submit"
-              className="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition"
+              className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
             >
-              Add Reminder
+              Set Reminder
             </button>
           </form>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold text-purple-700 mb-4">Active Reminders</h2>
-          {reminders.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-purple-200">
-                  <th className="p-2">Title</th>
-                  <th className="p-2">Time</th>
-                  <th className="p-2">Frequency</th>
-                  <th className="p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-2 text-purple-800">Your Reminders</h3>
+            {reminders.length === 0 ? (
+              <p>No reminders set yet.</p>
+            ) : (
+              <ul className="space-y-2">
                 {reminders.map((reminder) => (
-                  <tr key={reminder.id} className="border-b">
-                    <td className="p-2">{reminder.title}</td>
-                    <td className="p-2">{new Date(reminder.time).toLocaleString()}</td>
-                    <td className="p-2">{reminder.frequency}</td>
-                    <td className="p-2">
-                      <button
-                        onClick={() => handleDeleteReminder(reminder.id)}
-                        className="text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+                  <li key={reminder.id} className="p-4 bg-purple-100 rounded-lg flex justify-between items-center">
+                    <div>
+                      <p className="font-semibold">{reminder.text}</p>
+                      <p className="text-sm text-gray-600">{new Date(reminder.time).toLocaleString()}</p>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(reminder.id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </li>
                 ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No reminders set</p>
-          )}
+              </ul>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      );
+    };
+
+    export default Reminders;
