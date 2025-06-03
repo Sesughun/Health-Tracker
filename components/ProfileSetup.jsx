@@ -1,109 +1,87 @@
 'use client';
 
-import { useState } from 'react';
-import { setProfile as saveProfile } from '../utils/storage';
+    import { useState } from 'react';
+    import { setProfile } from '../utils/storage';
 
-export default function ProfileSetup({ setProfile, setCurrentPage }) {
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
-  const [condition, setCondition] = useState('');
-  const [error, setError] = useState('');
+    const ProfileSetup = ({ onSetup }) => {
+      const [age, setAge] = useState('');
+      const [gender, setGender] = useState('');
+      const [condition, setCondition] = useState('');
+      const [error, setError] = useState('');
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (!age || !gender || !height || !weight || !condition) {
-      setError('All fields are required');
-      return;
-    }
-    const profileData = { age, gender, height, weight, condition, emoji: gender === 'Male' ? '🧑' : gender === 'Female' ? '👩' : '🧑‍🦰' };
-    setProfile(profileData);
-    saveProfile(profileData);
-    setCurrentPage('dashboard');
-  };
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!age || !gender || !condition) {
+          setError('All fields are required');
+          return;
+        }
+        const profileData = { age, gender, condition };
+        setProfile(profileData);
+        onSetup(profileData);
+      };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-purple-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-purple-700 mb-6 text-center">Profile Setup</h1>
-        <form onSubmit={handleSave}>
-          <select
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          >
-            <option value="">Select Age</option>
-            {[...Array(11).keys()].map((i) => (
-              <option key={i} value={15 + i}>{15 + i}</option>
-            ))}
-          </select>
-          <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <input
-            type="number"
-            placeholder="Height (cm)"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <input
-            type="number"
-            placeholder="Weight (kg)"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Health Condition</label>
-            <div>
-              <label className="inline-flex items-center mr-4">
-                <input
-                  type="radio"
-                  name="condition"
-                  value="diabetes"
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-6 text-center text-purple-800">
+              Setup Your Profile
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Age</label>
+                <select
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                >
+                  <option value="">Select your age</option>
+                  {Array.from({ length: 11 }, (_, i) => i + 15).map((age) => (
+                    <option key={age} value={age}>
+                      {age}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Gender</label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded-md"
+                >
+                  <option value="">Select your gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-700">
+                  Health Condition
+                </label>
+                <select
+                  value={condition}
                   onChange={(e) => setCondition(e.target.value)}
-                  className="form-radio text-purple-600"
-                />
-                <span className="ml-2">Diabetes</span>
-              </label>
-              <label className="inline-flex items-center mr-4">
-                <input
-                  type="radio"
-                  name="condition"
-                  value="ulcers"
-                  onChange={(e) => setCondition(e.target.value)}
-                  className="form-radio text-purple-600"
-                />
-                <span className="ml-2">Ulcers</span>
-              </label>
-              <label className="inline-flex items-center" title="Only Diabetes and Ulcers are supported">
-                <input type="radio" name="condition" disabled className="form-radio text-gray-400" />
-                <span className="ml-2 text-gray-400">Hypertension</span>
-              </label>
-            </div>
+                  className="mt-1 p-2 w-full border rounded-md"
+                >
+                  <option value="">Select your condition</option>
+                  <option value="diabetes">Diabetes</option>
+                  <option value="ulcers">Ulcers</option>
+                  <option value="hypertension" disabled title="Only Diabetes and Ulcers are supported">
+                    Hypertension
+                  </option>
+                </select>
+              </div>
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <button
+                type="submit"
+                className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
+              >
+                Save Profile
+              </button>
+            </form>
           </div>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <button
-            type="submit"
-            className="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition"
-          >
-            Save and Continue
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
+        </div>
+      );
+    };
+
+    export default ProfileSetup;
