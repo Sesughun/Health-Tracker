@@ -1,51 +1,36 @@
 'use client';
 
-import { clearUser } from '../utils/storage';
+    const Sidebar = ({ setCurrentPage, handleLogout }) => {
+      const navItems = [
+        { name: 'Dashboard', page: 'dashboard' },
+        { name: 'Meal Tracker', page: 'meals' },
+        { name: 'Metrics Tracker', page: 'metrics' },
+        { name: 'Reminders', page: 'reminders' },
+        { name: 'Profile', page: 'profile' },
+      ];
 
-export default function Sidebar({ setCurrentPage }) {
-  return (
-    <div className="w-64 bg-purple-800 text-white h-screen p-4">
-      <h2 className="text-2xl font-bold mb-6">CU Health Tracker</h2>
-      <nav>
-        <ul>
-          <li>
-            <button onClick={() => setCurrentPage('dashboard')} className="block py-2 hover:bg-purple-700 rounded">
-              Home
-            </button>
-          </li>
-          <li>
-            <button onClick={() => setCurrentPage('meals')} className="block py-2 hover:bg-purple-700 rounded">
-              Meal Tracker
-            </button>
-          </li>
-          <li>
-            <button onClick={() => setCurrentPage('metrics')} className="block py-2 hover:bg-purple-700 rounded">
-              Health Metrics
-            </button>
-          </li>
-          <li>
-            <button onClick={() => setCurrentPage('reminders')} className="block py-2 hover:bg-purple-700 rounded">
-              Alerts/Reminders
-            </button>
-          </li>
-          <li>
-            <button onClick={() => setCurrentPage('profile')} className="block py-2 hover:bg-purple-700 rounded">
-              Profile
-            </button>
-          </li>
-          <li>
+      return (
+        <div className="w-64 bg-purple-200 h-screen p-4">
+          <h2 className="text-xl font-bold mb-6 text-purple-800">CU Health Tracker</h2>
+          <nav className="space-y-2">
+            {navItems.map((item) => (
+              <button
+                key={item.page}
+                onClick={() => setCurrentPage(item.page)}
+                className="w-full text-left p-2 rounded-md hover:bg-purple-300 text-purple-800"
+              >
+                {item.name}
+              </button>
+            ))}
             <button
-              onClick={() => {
-                clearUser();
-                setCurrentPage('login');
-              }}
-              className="block py-2 hover:bg-purple-700 rounded"
+              onClick={handleLogout}
+              className="w-full text-left p-2 rounded-md hover:bg-purple-300 text-red-600"
             >
               Logout
             </button>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  );
-}
+          </nav>
+        </div>
+      );
+    };
+
+    export default Sidebar;
